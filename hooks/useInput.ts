@@ -7,5 +7,4 @@ const useInput = <T>(initialData: T): [T, (e: ChangeEvent<HTMLInputElement>) => 
   }, [])
   return [value, handler, setValue]
 }
-
 export default useInput
