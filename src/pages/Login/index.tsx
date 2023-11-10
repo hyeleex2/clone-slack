@@ -14,7 +14,7 @@ import axios from "axios";
 // import { Redirect } from "react-router-dom";
 import useSWR from "swr";
 
-export const LogIn = () => {
+export default function LogIn() {
   // GET 요청
   // useSWR의 첫번째 파라미터(요청 주소)가 fetcher 함수의 파라미터로 전달됨
   // data가 존재하지 않으면 로딩중
@@ -99,6 +99,4 @@ export const LogIn = () => {
       </LinkContainer>
     </div>
   );
-};
-
-export default LogIn;
+}

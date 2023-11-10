@@ -6,12 +6,14 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@components/*": ["components/*"],
-      "@hooks/*": ["hooks/*"],
-      "@pages/*": ["pages/*"],
-      "@layouts/*": ["layouts/*"],
-      "@typings/*": ["typings/*"],
-      "@utils/*": ["utils/*"]
+      "@*": ["src/*"],
+      // "@src/*": ["src/*"]
+      // "@components/*": ["components/*"],
+      // "@hooks/*": ["hooks/*"],
+      "@pages/*": ["src/pages/*"]
+      // "@layouts/*": ["layouts/*"],
+      // "@typings/*": ["typings/*"],
+      // "@utils/*": ["utils/*"]
     },
 
     /* Bundler mode */

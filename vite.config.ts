@@ -6,13 +6,13 @@ import * as path from "path";
 export default defineConfig({
   resolve: {
     alias: {
-      "@": path.resolve(__dirname),
-      "@hooks": path.resolve(__dirname, "hooks"),
-      "@pages": path.resolve(__dirname, "pages"),
-      "@layouts": path.resolve(__dirname, "layouts"),
-      "@typings": path.resolve(__dirname, "typings"),
-      "@utils": path.resolve(__dirname, "utils"),
-      "@components": path.resolve(__dirname, "components"),
+      "@": path.resolve(__dirname, "src"),
+      "@hooks": path.resolve(__dirname, "src/hooks"),
+      "@pages": path.resolve(__dirname, "src/pages"),
+      "@layouts": path.resolve(__dirname, "src/layouts"),
+      "@utils": path.resolve(__dirname, "src/utils"),
+      "@components": path.resolve(__dirname, "src/components"),
+      // "@typings": path.resolve(__dirname, "src/typings"),
     },
   },
   plugins: [react()],
