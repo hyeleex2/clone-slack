@@ -1,4 +1,4 @@
-import React, { useState, useCallback, ChangeEvent } from "react";
+import { useState, useCallback, ChangeEvent } from "react";
 import {
   Button,
   Error,
@@ -54,7 +54,8 @@ export default function SignUp() {
           .catch((error) => {
             console.log(error.response?.data);
             setSignUpError(error.response?.data?.code === 403);
-          });
+          })
+          .finally(() => {});
       }
     },
     [email, nickname, password, mismatchError]
