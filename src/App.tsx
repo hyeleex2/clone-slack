@@ -1,10 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
-// import loadable from "@loadable/component";
-import LogIn from "@pages/Login";
-import SignUp from "@pages/SignUp";
-// const Login = loadable(() => import("@pages/Login"));
-// const SignUp = loadable(() => import("@pages/SignUp"));
+import loadable from "@loadable/component";
+// import Channel from "@pages/Channel";
+
+const LogIn = loadable(() => import("@pages/Login"));
+const SignUp = loadable(() => import("@pages/SignUp"));
+const Channel = loadable(() => import("@pages/Channel"));
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/" element={<Navigate replace to="/login" />} />
         <Route path="/login" Component={LogIn} />
         <Route path="/signup" Component={SignUp} />
+        <Route path="/workspace/channel" Component={Channel} />
       </Routes>
     </BrowserRouter>
   );

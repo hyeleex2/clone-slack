@@ -13,17 +13,14 @@ import { FormEvent, useCallback, useState } from "react";
 import axios from "axios";
 // import { Redirect } from "react-router-dom";
 import useSWR from "swr";
+import { Navigate, redirect } from "react-router-dom";
 
 export default function LogIn() {
   // GET 요청
   // useSWR의 첫번째 파라미터(요청 주소)가 fetcher 함수의 파라미터로 전달됨
   // data가 존재하지 않으면 로딩중
   // 프론트랑 백이랑 도메인이 다르면 쿠키 생성도 안되고 전달도 안됨.. >> axios의 withCredentials를 true로 설정해야 됨
-  const {
-    data: userData,
-    error,
-    mutate,
-  } = useSWR("/api/users", fetcher, {
+  const { data, mutate, error } = useSWR("/api/users", fetcher, {
     // 요청 주기
     dedupingInterval: 100000,
   });
@@ -43,7 +40,6 @@ export default function LogIn() {
           }
         )
         .then(() => {
-          console.log("로그인 성공");
           mutate();
         })
         .catch((error) => {
@@ -51,15 +47,12 @@ export default function LogIn() {
           setLogInError(error.response?.status === 401);
         });
     },
-    // mutate
-    [email, password]
+    [email, password, mutate]
   );
 
-  // console.log(error, userData);
-  // if (!error && userData) {
-  //   console.log("로그인됨", userData);
-  //   return <Redirect to="/workspace/sleact/channel/일반" />;
-  // }
+  if (!error && data) {
+    return <Navigate to="/workspace/channel" />;
+  }
   return (
     <div id="container">
       <Header>Sleact</Header>
