@@ -30,6 +30,8 @@ import { toast } from "react-toastify";
 import CreateChannelModal from "@components/CreateChannelModal";
 import InviteWorkspaceModal from "@components/InviteWorkspaceModal";
 import InviteChannelModal from "@components/InviteChannelModal";
+import DMList from "@components/DMList";
+import ChannelList from "@components/ChannelList";
 
 export default function WorkSpace() {
   const { data: userData, mutate } = useSWR<IUser | false>(
@@ -49,6 +51,11 @@ export default function WorkSpace() {
     fetcher
   );
 
+  const { data: memberData } = useSWR<IUser[]>(
+    userData ? `/api/workspaces/${workspace}/members` : null,
+    fetcher
+  );
+
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] =
     useState(false);
@@ -60,7 +67,7 @@ export default function WorkSpace() {
   const [newWorkspace, onChangeNewWorkspace, setNewWorkspace] = useInput("");
   const [newUrl, onChangeNewUrl, setNewUrl] = useInput("");
 
-  const onLogout = useCallback(() => {
+  const onLogOut = useCallback(() => {
     axios
       .post("/api/users/logout", null, {
         withCredentials: true,
@@ -126,7 +133,9 @@ export default function WorkSpace() {
     setShowCreateChannelModal((prev) => !prev);
   }, []);
 
-  const onClickInviteWorkspace = useCallback(() => {}, []);
+  const onClickInviteWorkspace = useCallback(() => {
+    setShowInviteWorkspaceModal(true);
+  }, []);
 
   if (!userData) {
     return <Navigate to="/login" />;
@@ -164,7 +173,7 @@ export default function WorkSpace() {
                     <span id="profile-active">Active</span>
                   </div>
                 </ProfileModal>
-                <LogOutButton onClick={onLogout}>로그아웃</LogOutButton>
+                <LogOutButton onClick={onLogOut}>로그아웃</LogOutButton>
               </Menu>
             )}
           </span>
@@ -172,7 +181,7 @@ export default function WorkSpace() {
       </Header>
       <WorkspaceWrapper>
         <Workspaces>
-          {userData.Workspaces.map((ws) => {
+          {userData?.Workspaces?.map((ws) => {
             return (
               <Link key={ws.id} to={`/workspace/${ws.url}/channel/일반`}>
                 <WorkspaceButton>
@@ -185,7 +194,7 @@ export default function WorkSpace() {
         </Workspaces>
         <Channels>
           <WorkspaceName onClick={toggleWorkspaceModal}>
-            {userData?.Workspaces.find((v) => v.url === workspace)?.name}
+            {userData?.Workspaces?.find((v) => v.url === workspace)?.name}
           </WorkspaceName>
           <MenuScroll>
             <Menu
@@ -194,13 +203,22 @@ export default function WorkSpace() {
               style={{ top: 95, left: 80 }}
             >
               <WorkspaceModal>
-                <h2>Sleact</h2>
+                <h2>
+                  {userData?.Workspaces.find((v) => v.url === workspace)?.name}
+                </h2>
                 <button onClick={onClickAddChannel}>채널 만들기</button>
+                <button onClick={onClickInviteWorkspace}>
+                  워크스페이스에 사용자 초대
+                </button>
+                <button onClick={onLogOut}>로그아웃</button>
               </WorkspaceModal>
             </Menu>
-            {channelData?.map((ch) => {
+            <ChannelList />
+            <DMList />
+            {/* 채널 리스트 */}
+            {/* {channelData?.map((ch) => {
               return <div key={ch.id}>{ch.name}</div>;
-            })}
+            })} */}
           </MenuScroll>
         </Channels>
         <Chats>
