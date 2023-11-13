@@ -28,6 +28,8 @@ import { Button, Input, Label } from "@pages/SignUp/styles";
 import useInput from "@hooks/useInput";
 import { toast } from "react-toastify";
 import CreateChannelModal from "@components/CreateChannelModal";
+import InviteWorkspaceModal from "@components/InviteWorkspaceModal";
+import InviteChannelModal from "@components/InviteChannelModal";
 
 export default function WorkSpace() {
   const { data: userData, mutate } = useSWR<IUser | false>(
@@ -52,6 +54,7 @@ export default function WorkSpace() {
     useState(false);
   const [showInviteWorkspaceModal, setShowInviteWorkspaceModal] =
     useState(false);
+  const [showInviteChannelModal, setShowInviteChannelModal] = useState(false);
   const [showCreateChannelModal, setShowCreateChannelModal] = useState(false);
   const [showWorkspaceModal, setShowWorkspaceModal] = useState(false);
   const [newWorkspace, onChangeNewWorkspace, setNewWorkspace] = useInput("");
@@ -122,6 +125,8 @@ export default function WorkSpace() {
   const onClickAddChannel = useCallback(() => {
     setShowCreateChannelModal((prev) => !prev);
   }, []);
+
+  const onClickInviteWorkspace = useCallback(() => {}, []);
 
   if (!userData) {
     return <Navigate to="/login" />;
@@ -228,6 +233,16 @@ export default function WorkSpace() {
         show={showCreateChannelModal}
         onCloseModal={onCloseModal}
         setShowCreateChannelModal={setShowCreateChannelModal}
+      />
+      <InviteWorkspaceModal
+        show={showInviteWorkspaceModal}
+        onCloseModal={onCloseModal}
+        setShowInviteWorkspaceModal={setShowInviteWorkspaceModal}
+      />
+      <InviteChannelModal
+        show={showInviteChannelModal}
+        onCloseModal={onCloseModal}
+        setShowInviteChannelModal={setShowInviteChannelModal}
       />
     </>
   );

@@ -12,38 +12,41 @@ import fetcher from "@utils/fetcher";
 type Prop = {
   show: boolean;
   onCloseModal: () => void;
-  setShowCreateChannelModal: (flag: boolean) => void;
+  setShowInviteChannelModal: (flag: boolean) => void;
 };
 
-export default function CreateChannelModal({
+export default function InviteChannelModal({
   show,
   onCloseModal,
-  setShowCreateChannelModal,
+  setShowInviteChannelModal,
 }: Prop) {
-  const [newChannel, onChangeNewChannel, setNewChannel] = useInput("");
-  const { workspace } = useParams<{
+  const [newMember, onChangeNewMember, setNewMember] = useInput("");
+  const { workspace, channel } = useParams<{
     workspace: string;
+    channel: string;
   }>();
 
   const { data: userData } = useSWR<IUser | false>("/api/users", fetcher);
 
-  const { data: channelData, mutate } = useSWR<IChannel[]>(
+  const { mutate } = useSWR<IChannel[]>(
     // 조건부 요청 : 로그인한 상태일 때만 요청하게 함
-    userData ? `/api/workspaces/${workspace}/channels` : null,
+    userData
+      ? `/api/workspaces/${workspace}/channels/${channel}/members`
+      : null,
     fetcher
   );
 
-  const onCreateChannel = useCallback(
+  const onInviteMember = useCallback(
     (e: FormEvent) => {
       e.preventDefault();
 
-      if (!newChannel || !newChannel.trim()) return;
+      if (!newMember || !newMember.trim()) return;
 
       axios
         .post(
-          `/api/workspaces/${workspace}/channels`,
+          `/api/workspaces/${workspace}/members`,
           {
-            name: newChannel,
+            email: newMember,
           },
           {
             withCredentials: true,
@@ -51,8 +54,8 @@ export default function CreateChannelModal({
         )
         .then((response) => {
           mutate(response?.data, false);
-          setShowCreateChannelModal(false);
-          setNewChannel("");
+          setShowInviteChannelModal(false);
+          setNewMember("");
         })
         .catch((error) => {
           console.dir(error);
@@ -61,7 +64,7 @@ export default function CreateChannelModal({
           });
         });
     },
-    [newChannel]
+    [newMember]
   );
 
   if (!show) {
@@ -70,16 +73,12 @@ export default function CreateChannelModal({
 
   return (
     <Modal show={show} onCloseModal={onCloseModal}>
-      <form onSubmit={onCreateChannel}>
-        <Label id="workspace-label">
-          <span>채널</span>
-          <Input
-            id="channel"
-            value={newChannel}
-            onChange={onChangeNewChannel}
-          />
+      <form onSubmit={onInviteMember}>
+        <Label id="member-label">
+          <span>이메일</span>
+          <Input id="member" value={newMember} onChange={onChangeNewMember} />
         </Label>
-        <Button type="submit">생성하기</Button>
+        <Button type="submit">초대하기</Button>
       </form>
     </Modal>
   );
