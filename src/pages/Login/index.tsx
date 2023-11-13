@@ -11,9 +11,8 @@ import {
 } from "@pages/SignUp/styles";
 import { FormEvent, useCallback, useState } from "react";
 import axios from "axios";
-// import { Redirect } from "react-router-dom";
 import useSWR from "swr";
-import { Navigate, redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 export default function LogIn() {
   // GET 요청
@@ -21,7 +20,7 @@ export default function LogIn() {
   // data가 존재하지 않으면 로딩중
   // 프론트랑 백이랑 도메인이 다르면 쿠키 생성도 안되고 전달도 안됨.. >> axios의 withCredentials를 true로 설정해야 됨
   const { data, mutate, error } = useSWR("/api/users", fetcher, {
-    // 요청 주기
+    // 요청 캐싱 주기
     dedupingInterval: 100000,
   });
   const [logInError, setLogInError] = useState(false);
@@ -39,11 +38,14 @@ export default function LogIn() {
             withCredentials: true,
           }
         )
-        .then(() => {
-          mutate();
+        .then((response) => {
+          // mutate: 서버에 요청을 보내지 않고 data를 바꿔치기 함
+          mutate(response.data, false);
+          // Optimistic UI : 인스타에서 하트 누르면 일단 ui는 바꿔주고 API 호출하는 형태
+          // 먼저 성공할 거라고 생각하고 점검하는 UI
+          // mutate의 두번째 파라미터로 false 하면 서버에 재요청을 보내지 않음
         })
         .catch((error) => {
-          console.dir(error);
           setLogInError(error.response?.status === 401);
         });
     },

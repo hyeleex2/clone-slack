@@ -9,9 +9,11 @@ import {
   LinkContainer,
   Success,
 } from "@pages/SignUp/styles";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import useInput from "@hooks/useInput";
 import axios from "axios";
+import fetcher from "@utils/fetcher";
+import useSWR from "swr";
 
 export default function SignUp() {
   const [signUpError, setSignUpError] = useState<boolean>(false);
@@ -21,6 +23,7 @@ export default function SignUp() {
   const [nickname, onChangeNickname] = useInput<string>("");
   const [password, , setPassword] = useInput<string>("");
   const [passwordCheck, , setPasswordCheck] = useInput<string>("");
+  const { data } = useSWR("/api/users", fetcher);
 
   const onChangePassword = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -61,6 +64,13 @@ export default function SignUp() {
     },
     [email, nickname, password, mismatchError]
   );
+
+  // if (isLoading) {
+  //   return <div>로딩중..</div>;
+  // }
+  if (data) {
+    return <Navigate to="/workspace/channel" />;
+  }
 
   return (
     <div id="container">

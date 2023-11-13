@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
 import loadable from "@loadable/component";
-// import Channel from "@pages/Channel";
 
 const LogIn = loadable(() => import("@pages/Login"));
 const SignUp = loadable(() => import("@pages/SignUp"));
