@@ -15,9 +15,15 @@ function App() {
         <Route path="/" element={<Navigate replace to="/login" />} />
         <Route path="/login" Component={LogIn} />
         <Route path="/signup" Component={SignUp} />
-        <Route element={<Workspace />}>
-          <Route path="/workspace/channel" element={<Channel />} />
-          <Route path="/workspace/dm" element={<DirectMessage />} />
+        <Route path="/workspace/:workspace" element={<Workspace />}>
+          <Route
+            path="/workspace/:workspace/channel/:channel"
+            element={<Channel />}
+          />
+          <Route
+            path="/workspace/:workspace/dm/:id"
+            element={<DirectMessage />}
+          />
         </Route>
       </Routes>
     </BrowserRouter>

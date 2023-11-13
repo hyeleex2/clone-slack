@@ -19,10 +19,10 @@ import {
   WorkspaceModal,
 } from "@layouts/Workspace/styles";
 import gravatar from "gravatar";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useParams } from "react-router-dom";
 import Menu from "@components/Menu";
 import Modal from "@components/Modal";
-import type { IUser } from "@typings/db";
+import type { IChannel, IUser } from "@typings/db";
 import { Link } from "react-router-dom";
 import { Button, Input, Label } from "@pages/SignUp/styles";
 import useInput from "@hooks/useInput";
@@ -32,6 +32,18 @@ import CreateChannelModal from "@components/CreateChannelModal";
 export default function WorkSpace() {
   const { data: userData, mutate } = useSWR<IUser | false>(
     "/api/users",
+    fetcher
+  );
+
+  // URL PARAM
+  const { workspace } = useParams<{
+    workspace: string;
+  }>();
+
+  // 내 워크페이스에 있는 채널 가져오기
+  const { data: channelData } = useSWR<IChannel[]>(
+    // 조건부 요청 : 로그인한 상태일 때만 요청하게 함
+    userData ? `/api/workspaces/${workspace}/channels` : null,
     fetcher
   );
 
@@ -64,12 +76,10 @@ export default function WorkSpace() {
     setShowCreateWorkspaceModal((prev) => !prev);
   }, []);
 
-  const onCloseCreateChannelModal = useCallback(() => {
-    setShowCreateChannelModal((prev) => !prev);
-  }, []);
-
   const onCloseModal = useCallback(() => {
-    setShowCreateWorkspaceModal((prev) => !prev);
+    setShowCreateWorkspaceModal(false);
+    setShowCreateChannelModal(false);
+    setShowInviteWorkspaceModal(false);
   }, []);
 
   const onCreateWorkspace = useCallback(
@@ -96,7 +106,7 @@ export default function WorkSpace() {
           setNewUrl("");
         })
         .catch((error) => {
-          console.log(error);
+          console.dir(error);
           toast.error(error.response?.data, {
             position: "bottom-center",
           });
@@ -159,7 +169,7 @@ export default function WorkSpace() {
         <Workspaces>
           {userData.Workspaces.map((ws) => {
             return (
-              <Link key={ws.id} to={`/workspace/${userData.id}/channel/일반`}>
+              <Link key={ws.id} to={`/workspace/${ws.url}/channel/일반`}>
                 <WorkspaceButton>
                   {ws.name.slice(0, 1).toUpperCase()}
                 </WorkspaceButton>
@@ -169,7 +179,9 @@ export default function WorkSpace() {
           <AddButton onClick={onClickCreateWorkspace}>+</AddButton>
         </Workspaces>
         <Channels>
-          <WorkspaceName onClick={toggleWorkspaceModal}>Sleact</WorkspaceName>
+          <WorkspaceName onClick={toggleWorkspaceModal}>
+            {userData?.Workspaces.find((v) => v.url === workspace)?.name}
+          </WorkspaceName>
           <MenuScroll>
             <Menu
               show={showWorkspaceModal}
@@ -181,6 +193,9 @@ export default function WorkSpace() {
                 <button onClick={onClickAddChannel}>채널 만들기</button>
               </WorkspaceModal>
             </Menu>
+            {channelData?.map((ch) => {
+              return <div key={ch.id}>{ch.name}</div>;
+            })}
           </MenuScroll>
         </Channels>
         <Chats>
@@ -211,7 +226,7 @@ export default function WorkSpace() {
       </Modal>
       <CreateChannelModal
         show={showCreateChannelModal}
-        onCloseModal={onCloseCreateChannelModal}
+        onCloseModal={onCloseModal}
         setShowCreateChannelModal={setShowCreateChannelModal}
       />
     </>

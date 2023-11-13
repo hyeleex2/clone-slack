@@ -65,11 +65,8 @@ export default function SignUp() {
     [email, nickname, password, mismatchError]
   );
 
-  // if (isLoading) {
-  //   return <div>로딩중..</div>;
-  // }
   if (data) {
-    return <Navigate to="/workspace/channel" />;
+    return <Navigate to="/workspace/sleact/channel/일반" />;
   }
 
   return (

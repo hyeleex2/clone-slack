@@ -4,6 +4,10 @@ import useInput from "@hooks/useInput";
 import axios from "axios";
 import { Button, Input, Label } from "@pages/SignUp/styles";
 import { toast } from "react-toastify";
+import { useParams } from "react-router";
+import useSWR from "swr";
+import { IChannel, IUser } from "@typings/db";
+import fetcher from "@utils/fetcher";
 
 type Prop = {
   show: boolean;
@@ -17,28 +21,41 @@ export default function CreateChannelModal({
   setShowCreateChannelModal,
 }: Prop) {
   const [newChannel, onChangeNewChannel, setNewChannel] = useInput("");
-  const onCreateWorkspace = useCallback(
+  const { workspace } = useParams<{
+    workspace: string;
+  }>();
+
+  const { data: userData } = useSWR<IUser | false>("/api/users", fetcher);
+
+  const { data: channelData, mutate } = useSWR<IChannel[]>(
+    // 조건부 요청 : 로그인한 상태일 때만 요청하게 함
+    userData ? `/api/workspaces/${workspace}/channels` : null,
+    fetcher
+  );
+
+  const onCreateChannel = useCallback(
     (e: FormEvent) => {
       e.preventDefault();
+
       if (!newChannel || !newChannel.trim()) return;
 
       axios
         .post(
-          "/api/channels",
+          `/api/workspaces/${workspace}/channels`,
           {
-            channel: newChannel,
+            name: newChannel,
           },
           {
             withCredentials: true,
           }
         )
         .then(() => {
-          // mutate();
           setShowCreateChannelModal(false);
           setNewChannel("");
+          mutate();
         })
         .catch((error) => {
-          console.log(error);
+          console.dir(error);
           toast.error(error.response?.data, {
             position: "bottom-center",
           });
@@ -53,7 +70,7 @@ export default function CreateChannelModal({
 
   return (
     <Modal show={show} onCloseModal={onCloseModal}>
-      <form onSubmit={onCreateWorkspace}>
+      <form onSubmit={onCreateChannel}>
         <Label id="workspace-label">
           <span>채널</span>
           <Input
