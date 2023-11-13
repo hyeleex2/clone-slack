@@ -16,6 +16,7 @@ import {
   LogOutButton,
   WorkspaceButton,
   AddButton,
+  WorkspaceModal,
 } from "@layouts/Workspace/styles";
 import gravatar from "gravatar";
 import { Navigate, Outlet } from "react-router-dom";
@@ -26,17 +27,19 @@ import { Link } from "react-router-dom";
 import { Button, Input, Label } from "@pages/SignUp/styles";
 import useInput from "@hooks/useInput";
 import { toast } from "react-toastify";
+import CreateChannelModal from "@components/CreateChannelModal";
 
 export default function WorkSpace() {
   const { data: userData, mutate } = useSWR<IUser | false>(
     "/api/users",
     fetcher
   );
+
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] =
     useState(false);
-  // const [showInviteWorkspaceModal, setShowInviteWorkspaceModal] =
-  //   useState(false);
+  const [showInviteWorkspaceModal, setShowInviteWorkspaceModal] =
+    useState(false);
   const [showCreateChannelModal, setShowCreateChannelModal] = useState(false);
   const [showWorkspaceModal, setShowWorkspaceModal] = useState(false);
   const [newWorkspace, onChangeNewWorkspace, setNewWorkspace] = useInput("");
@@ -59,6 +62,10 @@ export default function WorkSpace() {
 
   const onClickCreateWorkspace = useCallback(() => {
     setShowCreateWorkspaceModal((prev) => !prev);
+  }, []);
+
+  const onCloseCreateChannelModal = useCallback(() => {
+    setShowCreateChannelModal((prev) => !prev);
   }, []);
 
   const onCloseModal = useCallback(() => {
@@ -97,6 +104,14 @@ export default function WorkSpace() {
     },
     [newWorkspace, newUrl]
   );
+
+  const toggleWorkspaceModal = useCallback(() => {
+    setShowWorkspaceModal((prev) => !prev);
+  }, []);
+
+  const onClickAddChannel = useCallback(() => {
+    setShowCreateChannelModal((prev) => !prev);
+  }, []);
 
   if (!userData) {
     return <Navigate to="/login" />;
@@ -154,10 +169,22 @@ export default function WorkSpace() {
           <AddButton onClick={onClickCreateWorkspace}>+</AddButton>
         </Workspaces>
         <Channels>
-          <WorkspaceName>Sleact</WorkspaceName>
-          <MenuScroll>menu scroll</MenuScroll>
+          <WorkspaceName onClick={toggleWorkspaceModal}>Sleact</WorkspaceName>
+          <MenuScroll>
+            <Menu
+              show={showWorkspaceModal}
+              onCloseModal={toggleWorkspaceModal}
+              style={{ top: 95, left: 80 }}
+            >
+              <WorkspaceModal>
+                <h2>Sleact</h2>
+                <button onClick={onClickAddChannel}>채널 만들기</button>
+              </WorkspaceModal>
+            </Menu>
+          </MenuScroll>
         </Channels>
         <Chats>
+          {/* children */}
           <Outlet />
         </Chats>
       </WorkspaceWrapper>
@@ -182,6 +209,11 @@ export default function WorkSpace() {
           <Button type="submit">생성하기</Button>
         </form>
       </Modal>
+      <CreateChannelModal
+        show={showCreateChannelModal}
+        onCloseModal={onCloseCreateChannelModal}
+        setShowCreateChannelModal={setShowCreateChannelModal}
+      />
     </>
   );
 }

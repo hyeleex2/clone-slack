@@ -14,10 +14,15 @@ export default function Menu({
   onCloseModal,
   style,
   closeButton,
+  show,
 }: Prop) {
   const stopPropagation = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
   }, []);
+
+  if (!show) {
+    return null;
+  }
 
   return (
     <CreateMenu onClick={onCloseModal}>
