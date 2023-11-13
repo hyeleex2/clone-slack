@@ -2,7 +2,6 @@ import { useCallback } from "react";
 import fetcher from "@utils/fetcher";
 import useSWR from "swr";
 import axios from "axios";
-import { Navigate } from "react-router-dom";
 import {
   Header,
   ProfileImg,
@@ -15,12 +14,13 @@ import {
   MenuScroll,
 } from "@layouts/Workspace/styles";
 import gravatar from "gravatar";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import loadable from "@loadable/component";
+// import Channel from "@pages/Channel";
+const Channel = loadable(() => import("@pages/Channel"));
+const DirectMessage = loadable(() => import("@pages/DirectMessage"));
 
-type Props = {
-  children?: React.ReactNode;
-};
-
-export default function WorkSpace({ children }: Props) {
+export default function WorkSpace() {
   const { data, mutate } = useSWR("/api/users", fetcher);
   const onLogout = useCallback(() => {
     axios
@@ -50,6 +50,7 @@ export default function WorkSpace({ children }: Props) {
             />
           </span>
         </RightMenu>
+        <button onClick={onLogout}>로그아웃</button>
       </Header>
       <WorkspaceWrapper>
         <Workspaces>test</Workspaces>
@@ -57,10 +58,11 @@ export default function WorkSpace({ children }: Props) {
           <WorkspaceName>Sleact</WorkspaceName>
           <MenuScroll>menu scroll</MenuScroll>
         </Channels>
-        <Chats>Chats</Chats>
+
+        <Chats>
+          <Outlet />
+        </Chats>
       </WorkspaceWrapper>
-      {/* <button onClick={onLogout}>로그아웃</button> */}
-      {children}
     </div>
   );
 }

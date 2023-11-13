@@ -4,7 +4,9 @@ import loadable from "@loadable/component";
 
 const LogIn = loadable(() => import("@pages/Login"));
 const SignUp = loadable(() => import("@pages/SignUp"));
+const Workspace = loadable(() => import("@layouts/Workspace"));
 const Channel = loadable(() => import("@pages/Channel"));
+const DirectMessage = loadable(() => import("@pages/DirectMessage"));
 
 function App() {
   return (
@@ -13,7 +15,10 @@ function App() {
         <Route path="/" element={<Navigate replace to="/login" />} />
         <Route path="/login" Component={LogIn} />
         <Route path="/signup" Component={SignUp} />
-        <Route path="/workspace/channel" Component={Channel} />
+        <Route element={<Workspace />}>
+          <Route path="/workspace/channel" element={<Channel />} />
+          <Route path="/workspace/dm" element={<DirectMessage />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

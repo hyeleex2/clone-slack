@@ -1,8 +1,9 @@
-import Workspace from "@layouts/Workspace";
+import { Container, Header } from "./styles";
+
 export default function Channel() {
   return (
-    <Workspace>
-      <div>로그인 성공 축하</div>
-    </Workspace>
+    <Container>
+      <Header>채널!</Header>
+    </Container>
   );
 }
