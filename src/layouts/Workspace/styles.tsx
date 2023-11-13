@@ -17,7 +17,7 @@ export const ProfileImg = styled.img`
   width: 28px;
   height: 28px;
   position: absolute;
-  top: 5px;
+  top: 10px;
   right: 16px;
 `;
 

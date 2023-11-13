@@ -6,16 +6,8 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@*": ["src/*"],
-      // "@src/*": ["src/*"]
-      // "@components/*": ["components/*"],
-      // "@hooks/*": ["hooks/*"],
-      "@pages/*": ["src/pages/*"]
-      // "@layouts/*": ["layouts/*"],
-      // "@typings/*": ["typings/*"],
-      // "@utils/*": ["utils/*"]
+      "@*": ["src/*"]
     },
-
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
