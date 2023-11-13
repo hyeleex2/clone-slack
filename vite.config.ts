@@ -12,7 +12,7 @@ export default defineConfig({
       "@layouts": path.resolve(__dirname, "src/layouts"),
       "@utils": path.resolve(__dirname, "src/utils"),
       "@components": path.resolve(__dirname, "src/components"),
-      // "@typings": path.resolve(__dirname, "src/typings"),
+      "@typings": path.resolve(__dirname, "src/typings"),
     },
   },
   plugins: [react()],

@@ -5,7 +5,7 @@ type Prop = {
   children: React.ReactNode;
   style: CSSProperties;
   show: boolean;
-  onCloseModal: () => void;
+  onCloseModal: (e: React.MouseEvent) => void;
   closeButton?: boolean;
 };
 
