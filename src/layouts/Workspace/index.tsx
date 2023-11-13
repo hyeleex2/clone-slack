@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { FormEvent, useCallback, useState } from "react";
 import fetcher from "@utils/fetcher";
 import useSWR from "swr";
 import axios from "axios";
@@ -66,7 +66,7 @@ export default function WorkSpace() {
   }, []);
 
   const onCreateWorkspace = useCallback(
-    (e: SubmitEvent) => {
+    (e: FormEvent) => {
       e.preventDefault();
       if (!newWorkspace || !newWorkspace.trim()) return;
       if (!newUrl || !newUrl.trim()) return;
