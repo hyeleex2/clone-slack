@@ -141,7 +141,23 @@ export default function WorkSpace() {
   }, []);
 
   const [socket, disconnect] = useSocket(workspace);
-  useEffect(() => {}, []);
+
+  useEffect(() => {
+    if (socket && channelData && userData) {
+      socket.connect();
+      socket.emit("login", {
+        id: userData.id,
+        channels: channelData.map((v) => v.id),
+      });
+    }
+  }, [socket, channelData, userData]);
+
+  // workspace가 바뀔 때 diconnect socket
+  useEffect(() => {
+    return () => {
+      disconnect();
+    };
+  }, [workspace]);
 
   if (!userData) {
     return <Navigate to="/login" />;

@@ -11,7 +11,7 @@ export default function Channel() {
       e.preventDefault();
       setChat("");
     },
-    [chat]
+    [setChat]
   );
 
   return (

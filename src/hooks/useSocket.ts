@@ -1,33 +1,35 @@
-import { io, Socket } from "socket.io-client";
+import { io, type Socket } from "socket.io-client";
 
 import { useCallback } from "react";
 
 const backUrl = `http://localhost:3095`;
+// const backUrl = `http://localhost:3095`;
 
-type Sockets = {
-  [key: string]: Socket;
-};
+const sockets: { [key: string]: Socket } = {};
 
-const sockets: Sockets = {};
-
-export default function useSocket(workspace: string | undefined) {
+export default function useSocket(
+  workspace?: string
+): [Socket | undefined, () => void] {
   const disconnect = useCallback(() => {
-    if (workspace) {
+    if (workspace && sockets[workspace]) {
+      console.log("disconnect socket");
       sockets[workspace].disconnect();
       delete sockets[workspace];
     }
   }, [workspace]);
-
   if (!workspace) {
     return [undefined, disconnect];
   }
-  sockets[workspace] = io(`${backUrl}/ws-${workspace}`);
-  sockets[workspace].connect();
-  // sockets[workspace].emit("hello", "world");
-
-  // sockets[workspace].on("messgae", (data: any) => {
-  //   console.log(data);
-  // });
+  if (!sockets[workspace]) {
+    sockets[workspace] = io(`${backUrl}/ws-${workspace}`, {
+      transports: ["websocket"],
+    });
+    console.info("create socket", workspace, sockets[workspace]);
+    sockets[workspace].on("connect_error", (err) => {
+      console.error(err);
+      console.log(`connect_error due to ${err.message}`);
+    });
+  }
 
   return [sockets[workspace], disconnect];
 }

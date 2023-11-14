@@ -2,9 +2,10 @@ import { IUser, IUserWithOnline } from "@typings/db";
 import { useParams } from "react-router";
 import fetcher from "@utils/fetcher";
 import useSWR from "swr";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CollapseButton } from "./styles";
 import EachDM from "@components/EachDM";
+import useSocket from "@hooks/useSocket";
 
 export default function DMList() {
   const { data: userData } = useSWR<IUser | false>("/api/users", fetcher, {
@@ -22,11 +23,26 @@ export default function DMList() {
     fetcher
   );
 
+  const [socket] = useSocket(workspace);
+
   const toggleChannelCollapse = useCallback(() => {
     setChannelCollapse((prev) => !prev);
   }, []);
 
   const [onlineList, setOnlineList] = useState<number[]>([]);
+
+  useEffect(() => {
+    setOnlineList([]);
+  }, [workspace]);
+
+  useEffect(() => {
+    socket?.on("onlineList", (data: number[]) => {
+      setOnlineList(data);
+    });
+    return () => {
+      socket?.off("onlineList");
+    };
+  }, [socket]);
 
   return (
     <>
@@ -45,7 +61,6 @@ export default function DMList() {
       </h2>
       <div>
         {!channelCollapse &&
-          memberData &&
           memberData?.map((member) => {
             const isOnline = onlineList.includes(member.id);
             return (
