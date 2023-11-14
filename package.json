@@ -20,6 +20,7 @@
     "@types/react-mentions": "^4.1.12",
     "autosize": "^6.0.1",
     "axios": "^1.4.0",
+    "dayjs": "^1.11.10",
     "gravatar": "^1.8.2",
     "react": "^18.2.0",
     "react-custom-scrollbars": "^4.2.1",

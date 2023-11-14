@@ -23,11 +23,16 @@ export default function DirectMessage() {
   );
   const { data: myData } = useSWR("/api/users", fetcher);
   const PAGE_SIZE = "20";
-  const { data: chatData, mutate: mutateChat } = useSWRInfinite<IDM[]>(
-    (index) =>
-      `/api/workspaces/${workspace}/dms/${id}/chats?perPage=${PAGE_SIZE}&page=${
-        index + 1
-      }`,
+  // const { data: chatData, mutate: mutateChat } = useSWRInfinite<IDM[]>(
+  //   (index) =>
+  //     `/api/workspaces/${workspace}/dms/${id}/chats?perPage=${PAGE_SIZE}&page=${
+  //       index + 1
+  //     }`,
+  //   fetcher,
+  //   {}
+  // );
+  const { data: chatData, mutate: mutateChat } = useSWR<IDM[]>(
+    `/api/workspaces/${workspace}/dms/${id}/chats?perPage=20&page=1`,
     fetcher,
     {}
   );
@@ -70,8 +75,7 @@ export default function DirectMessage() {
         />
         <span>{userData.nickname}</span>
       </Header>
-      <ChatList />
-      {chat}
+      <ChatList chatData={chatData} />
       <ChatBox
         chat={chat}
         onSubmitForm={onSubmitForm}
