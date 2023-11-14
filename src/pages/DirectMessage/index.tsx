@@ -1,13 +1,15 @@
 import useSWR from "swr";
 import { Container, Header } from "./styles";
 import gravatar from "gravatar";
-import { IUser } from "@typings/db";
+import { IDM, IUser } from "@typings/db";
 import fetcher from "@utils/fetcher";
 import { useParams } from "react-router";
 import ChatList from "@components/ChatList";
 import ChatBox from "@components/ChatBox";
 import { FormEvent, useCallback } from "react";
 import useInput from "@hooks/useInput";
+import axios from "axios";
+import useSWRInfinite from "swr/infinite";
 
 export default function DirectMessage() {
   const { workspace, id } = useParams<{
@@ -20,13 +22,38 @@ export default function DirectMessage() {
     fetcher
   );
   const { data: myData } = useSWR("/api/users", fetcher);
+  const PAGE_SIZE = "20";
+  const { data: chatData, mutate: mutateChat } = useSWRInfinite<IDM[]>(
+    (index) =>
+      `/api/workspaces/${workspace}/dms/${id}/chats?perPage=${PAGE_SIZE}&page=${
+        index + 1
+      }`,
+    fetcher,
+    {}
+  );
 
   const [chat, onChangeChat, setChat] = useInput("");
 
-  const onSubmitForm = useCallback((e: FormEvent) => {
-    e.preventDefault();
-    setChat("");
-  }, []);
+  const onSubmitForm = useCallback(
+    (e: FormEvent) => {
+      e.preventDefault();
+      console.log("chat : ", chat);
+      if (chat?.trim()) {
+        axios
+          .post(`/api/workspaces/${workspace}/dms/${id}/chats`, {
+            content: chat,
+          })
+          .then(() => {
+            setChat("");
+            mutateChat();
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    },
+    [chat, workspace, id, setChat, mutateChat]
+  );
 
   if (!userData || !myData) {
     return null;
@@ -45,6 +72,7 @@ export default function DirectMessage() {
         <span>{userData.nickname}</span>
       </Header>
       <ChatList />
+      {chat}
       <ChatBox
         chat={chat}
         onSubmitForm={onSubmitForm}

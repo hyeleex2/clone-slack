@@ -53,7 +53,7 @@ export default function CreateChannelModal({
           toast.error(error.response?.data, { position: "bottom-center" });
         });
     },
-    [newChannel, setNewChannel, setShowCreateChannelModal, workspace]
+    [newChannel, setNewChannel, setShowCreateChannelModal, workspace, mutate]
   );
 
   if (!show) {

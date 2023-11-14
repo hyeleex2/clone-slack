@@ -17,7 +17,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { MentionsInput } from "react-mentions";
 
 interface Props {
   onSubmitForm: (e: FormEvent) => void;
@@ -33,13 +32,16 @@ export default function ChatBox({
   onSubmitForm,
   placeholder,
 }: Props) {
-  const onKeydownChat = useCallback((e: KeyboardEvent) => {
-    if (e.key === "Enter") {
-      if (!e.shiftKey) {
-        onSubmitForm(e);
+  const onKeydownChat = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === "Enter") {
+        if (!e.shiftKey) {
+          onSubmitForm(e);
+        }
       }
-    }
-  }, []);
+    },
+    [onSubmitForm]
+  );
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
