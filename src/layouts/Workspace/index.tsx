@@ -1,4 +1,4 @@
-import { FormEvent, useCallback, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import fetcher from "@utils/fetcher";
 import useSWR from "swr";
 import axios from "axios";
@@ -34,6 +34,7 @@ import DMList from "@components/DMList";
 import ChannelList from "@components/ChannelList";
 import Channel from "@pages/Channel";
 import DirectMessage from "@pages/DirectMessage";
+import useSocket from "@hooks/useSocket";
 
 export default function WorkSpace() {
   const { data: userData, mutate: revalidateUser } = useSWR<IUser | false>(
@@ -124,7 +125,7 @@ export default function WorkSpace() {
           });
         });
     },
-    [newWorkspace, newUrl]
+    [newWorkspace, newUrl, revalidateUser, setNewUrl, setNewWorkspace]
   );
 
   const toggleWorkspaceModal = useCallback(() => {
@@ -138,6 +139,9 @@ export default function WorkSpace() {
   const onClickInviteWorkspace = useCallback(() => {
     setShowInviteWorkspaceModal(true);
   }, []);
+
+  const [socket, disconnect] = useSocket(workspace);
+  useEffect(() => {}, []);
 
   if (!userData) {
     return <Navigate to="/login" />;

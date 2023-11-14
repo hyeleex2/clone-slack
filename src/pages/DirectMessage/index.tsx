@@ -37,7 +37,6 @@ export default function DirectMessage() {
   const onSubmitForm = useCallback(
     (e: FormEvent) => {
       e.preventDefault();
-      console.log("chat : ", chat);
       if (chat?.trim()) {
         axios
           .post(`/api/workspaces/${workspace}/dms/${id}/chats`, {
