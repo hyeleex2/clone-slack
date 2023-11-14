@@ -36,19 +36,13 @@ export default function CreateChannelModal({
   const onCreateChannel = useCallback(
     (e: FormEvent) => {
       e.preventDefault();
-
-      if (!newChannel || !newChannel.trim()) return;
-
+      if (!newChannel || !newChannel.trim()) {
+        return;
+      }
       axios
-        .post(
-          `/api/workspaces/${workspace}/channels`,
-          {
-            name: newChannel,
-          },
-          {
-            withCredentials: true,
-          }
-        )
+        .post(`/api/workspaces/${workspace}/channels`, {
+          name: newChannel,
+        })
         .then((response) => {
           mutate(response?.data, false);
           setShowCreateChannelModal(false);
@@ -56,12 +50,10 @@ export default function CreateChannelModal({
         })
         .catch((error) => {
           console.dir(error);
-          toast.error(error.response?.data, {
-            position: "bottom-center",
-          });
+          toast.error(error.response?.data, { position: "bottom-center" });
         });
     },
-    [newChannel]
+    [newChannel, setNewChannel, setShowCreateChannelModal, workspace]
   );
 
   if (!show) {

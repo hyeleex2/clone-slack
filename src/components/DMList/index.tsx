@@ -45,6 +45,7 @@ export default function DMList() {
       </h2>
       <div>
         {!channelCollapse &&
+          memberData &&
           memberData?.map((member) => {
             const isOnline = onlineList.includes(member.id);
             return (

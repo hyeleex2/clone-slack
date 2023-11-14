@@ -7,23 +7,25 @@ import useSWR from "swr";
 import EachChannel from "@components/EachChannel";
 
 export default function ChannelList() {
-  const { data: userData } = useSWR<IUser | false>("/api/users", fetcher, {
-    dedupingInterval: 2000,
-  });
   const [channelCollapse, setChannelCollapse] = useState(false);
 
   const { workspace } = useParams<{
     workspace: string;
   }>();
 
-  const toggleChannelCollapse = useCallback(() => {
-    setChannelCollapse((prev) => !prev);
-  }, []);
+  const { data: userData } = useSWR<IUser | false>("/api/users", fetcher, {
+    dedupingInterval: 2000,
+  });
 
   const { data: channelData } = useSWR<IChannel[]>(
     userData ? `/api/workspaces/${workspace}/channels` : null,
     fetcher
   );
+
+  const toggleChannelCollapse = useCallback(() => {
+    setChannelCollapse((prev) => !prev);
+  }, []);
+
   return (
     <>
       <h2>
@@ -41,6 +43,7 @@ export default function ChannelList() {
       </h2>
       <div>
         {!channelCollapse &&
+          channelData &&
           channelData?.map((channel) => {
             return <EachChannel key={channel.id} channel={channel} />;
           })}

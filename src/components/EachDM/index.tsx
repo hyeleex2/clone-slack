@@ -1,5 +1,6 @@
 import { IUser } from "@typings/db";
 import fetcher from "@utils/fetcher";
+import { useEffect } from "react";
 import { NavLink, useParams } from "react-router-dom";
 import useSWR from "swr";
 
@@ -15,6 +16,7 @@ export default function EachDM({ member, isOnline = true }: Prop) {
   const { workspace } = useParams<{
     workspace: string;
   }>();
+
   const date = localStorage.getItem(`${workspace}-${member.id}`) || 0;
 
   const { data: count, mutate } = useSWR<number>(
@@ -23,6 +25,13 @@ export default function EachDM({ member, isOnline = true }: Prop) {
       : null,
     fetcher
   );
+
+  useEffect(() => {
+    if (location.pathname === `/workspace/${workspace}/dm/${member.id}`) {
+      mutate(0);
+    }
+  }, [mutate, location.pathname, workspace, member]);
+
   return (
     <NavLink
       key={member.id}

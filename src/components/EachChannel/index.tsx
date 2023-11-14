@@ -15,6 +15,7 @@ export default function EachChannel({ channel }: Props) {
     dedupingInterval: 2000, // 2초
   });
   const date = localStorage.getItem(`${workspace}-${channel.name}`) || 0;
+
   const { data: count, mutate } = useSWR<number>(
     userData
       ? `/api/workspaces/${workspace}/channels/${channel.name}/unreads?after=${date}`
@@ -22,13 +23,13 @@ export default function EachChannel({ channel }: Props) {
     fetcher
   );
 
-  // useEffect(() => {
-  //   if (
-  //     location.pathname === `/workspace/${workspace}/channel/${channel.name}`
-  //   ) {
-  //     mutate(0);
-  //   }
-  // }, [mutate, location.pathname, workspace, channel]);
+  useEffect(() => {
+    if (
+      location.pathname === `/workspace/${workspace}/channel/${channel.name}`
+    ) {
+      mutate(0);
+    }
+  }, [mutate, location.pathname, workspace, channel]);
 
   return (
     <NavLink

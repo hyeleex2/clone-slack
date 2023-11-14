@@ -19,7 +19,7 @@ import {
   WorkspaceModal,
 } from "@layouts/Workspace/styles";
 import gravatar from "gravatar";
-import { Navigate, Outlet, useParams } from "react-router-dom";
+import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import Menu from "@components/Menu";
 import Modal from "@components/Modal";
 import type { IChannel, IUser } from "@typings/db";
@@ -32,9 +32,11 @@ import InviteWorkspaceModal from "@components/InviteWorkspaceModal";
 import InviteChannelModal from "@components/InviteChannelModal";
 import DMList from "@components/DMList";
 import ChannelList from "@components/ChannelList";
+import Channel from "@pages/Channel";
+import DirectMessage from "@pages/DirectMessage";
 
 export default function WorkSpace() {
-  const { data: userData, mutate } = useSWR<IUser | false>(
+  const { data: userData, mutate: revalidateUser } = useSWR<IUser | false>(
     "/api/users",
     fetcher
   );
@@ -73,7 +75,7 @@ export default function WorkSpace() {
         withCredentials: true,
       })
       .then(() => {
-        mutate(false, false);
+        revalidateUser();
       });
   }, []);
 
@@ -110,7 +112,7 @@ export default function WorkSpace() {
           }
         )
         .then(() => {
-          mutate();
+          revalidateUser();
           setShowCreateChannelModal(false);
           setNewWorkspace("");
           setNewUrl("");
@@ -204,7 +206,7 @@ export default function WorkSpace() {
             >
               <WorkspaceModal>
                 <h2>
-                  {userData?.Workspaces.find((v) => v.url === workspace)?.name}
+                  {userData?.Workspaces?.find((v) => v.url === workspace)?.name}
                 </h2>
                 <button onClick={onClickAddChannel}>채널 만들기</button>
                 <button onClick={onClickInviteWorkspace}>
@@ -215,15 +217,13 @@ export default function WorkSpace() {
             </Menu>
             <ChannelList />
             <DMList />
-            {/* 채널 리스트 */}
-            {/* {channelData?.map((ch) => {
-              return <div key={ch.id}>{ch.name}</div>;
-            })} */}
           </MenuScroll>
         </Channels>
         <Chats>
-          {/* children */}
-          <Outlet />
+          <Routes>
+            <Route path="/channel/:channel" element={<Channel />} />
+            <Route path="/dm/:id" element={<DirectMessage />} />
+          </Routes>
         </Chats>
       </WorkspaceWrapper>
       <Modal show={showCreateWorkspaceModal} onCloseModal={onCloseModal}>
@@ -257,11 +257,11 @@ export default function WorkSpace() {
         onCloseModal={onCloseModal}
         setShowInviteWorkspaceModal={setShowInviteWorkspaceModal}
       />
-      <InviteChannelModal
+      {/* <InviteChannelModal
         show={showInviteChannelModal}
         onCloseModal={onCloseModal}
         setShowInviteChannelModal={setShowInviteChannelModal}
-      />
+      /> */}
     </>
   );
 }

@@ -28,8 +28,7 @@ export default function InviteChannelModal({
 
   const { data: userData } = useSWR<IUser | false>("/api/users", fetcher);
 
-  const { mutate } = useSWR<IChannel[]>(
-    // 조건부 요청 : 로그인한 상태일 때만 요청하게 함
+  const { mutate: revalidateMembers } = useSWR<IUser[]>(
     userData
       ? `/api/workspaces/${workspace}/channels/${channel}/members`
       : null,
@@ -52,8 +51,8 @@ export default function InviteChannelModal({
             withCredentials: true,
           }
         )
-        .then((response) => {
-          mutate(response?.data, false);
+        .then(() => {
+          revalidateMembers();
           setShowInviteChannelModal(false);
           setNewMember("");
         })
