@@ -18,6 +18,7 @@ export const Form = styled.form`
 
 // styled(MentionsInput)`
 export const MentionsTextarea = styled.textarea`
+  width: 100%;
   font-family: Slack-Lato, appleLogo, sans-serif;
   font-size: 15px;
   padding: 8px 9px;

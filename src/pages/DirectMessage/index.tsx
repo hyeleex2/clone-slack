@@ -6,6 +6,8 @@ import fetcher from "@utils/fetcher";
 import { useParams } from "react-router";
 import ChatList from "@components/ChatList";
 import ChatBox from "@components/ChatBox";
+import { FormEvent, useCallback } from "react";
+import useInput from "@hooks/useInput";
 
 export default function DirectMessage() {
   const { workspace, id } = useParams<{
@@ -18,6 +20,13 @@ export default function DirectMessage() {
     fetcher
   );
   const { data: myData } = useSWR("/api/users", fetcher);
+
+  const [chat, onChangeChat, setChat] = useInput("");
+
+  const onSubmitForm = useCallback((e: FormEvent) => {
+    e.preventDefault();
+    setChat("");
+  }, []);
 
   if (!userData || !myData) {
     return null;
@@ -36,7 +45,11 @@ export default function DirectMessage() {
         <span>{userData.nickname}</span>
       </Header>
       <ChatList />
-      <ChatBox chat="" />
+      <ChatBox
+        chat={chat}
+        onSubmitForm={onSubmitForm}
+        onChangeChat={onChangeChat}
+      />
     </Container>
   );
 }
