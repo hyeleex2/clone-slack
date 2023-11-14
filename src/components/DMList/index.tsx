@@ -8,13 +8,13 @@ import EachDM from "@components/EachDM";
 import useSocket from "@hooks/useSocket";
 
 export default function DMList() {
-  const { data: userData } = useSWR<IUser | false>("/api/users", fetcher, {
-    dedupingInterval: 2000,
-  });
-
   const { workspace } = useParams<{
     workspace: string;
   }>();
+
+  const { data: userData } = useSWR<IUser | false>("/api/users", fetcher, {
+    dedupingInterval: 2000,
+  });
 
   const [channelCollapse, setChannelCollapse] = useState(false);
 
