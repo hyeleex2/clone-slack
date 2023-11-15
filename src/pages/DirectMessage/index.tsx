@@ -10,6 +10,7 @@ import { FormEvent, useCallback } from "react";
 import useInput from "@hooks/useInput";
 import axios from "axios";
 import useSWRInfinite from "swr/infinite";
+import makeSection from "@utils/makeSection";
 
 export default function DirectMessage() {
   const { workspace, id } = useParams<{
@@ -62,6 +63,7 @@ export default function DirectMessage() {
   if (!userData || !myData) {
     return null;
   }
+  const chatSections = makeSection(chatData ? [...chatData]?.reverse() : []);
 
   return (
     <Container>
@@ -75,7 +77,7 @@ export default function DirectMessage() {
         />
         <span>{userData.nickname}</span>
       </Header>
-      <ChatList chatData={chatData} />
+      <ChatList chatSections={chatSections} />
       <ChatBox
         chat={chat}
         onSubmitForm={onSubmitForm}
