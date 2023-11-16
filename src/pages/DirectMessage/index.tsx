@@ -6,7 +6,7 @@ import fetcher from "@utils/fetcher";
 import { useParams } from "react-router";
 import ChatList from "@components/ChatList";
 import ChatBox from "@components/ChatBox";
-import { FormEvent, useCallback, useRef } from "react";
+import { FormEvent, useCallback, useEffect, useRef } from "react";
 import useInput from "@hooks/useInput";
 import axios from "axios";
 import useSWRInfinite from "swr/infinite";
@@ -19,11 +19,15 @@ export default function DirectMessage() {
     id: string;
   }>();
 
+  const [chat, onChangeChat, setChat] = useInput("");
+  const scrollbarRef = useRef<Scrollbars>(null);
+
   const { data: userData } = useSWR<IUser>(
     `/api/workspace/${workspace}/users/${id}`,
     fetcher
   );
-  const { data: myData } = useSWR("/api/users", fetcher);
+
+  const { data: myData } = useSWR<IUser>("/api/users", fetcher);
 
   const PAGE_SIZE = 10;
 
@@ -48,34 +52,52 @@ export default function DirectMessage() {
     (chatData && chatData[chatData.length - 1]?.length < PAGE_SIZE) ||
     false;
 
-  const [chat, onChangeChat, setChat] = useInput("");
+  const chatSections = makeSection(chatData ? chatData.flat().reverse() : []);
 
   const onSubmitForm = useCallback(
     (e: FormEvent) => {
       e.preventDefault();
-      if (chat?.trim()) {
+      if (chat?.trim() && chatData && userData && myData) {
+        const savedChat = chat;
+        // OPTIMISTIC UI
+        mutateChat((prevChatData) => {
+          prevChatData?.[0].unshift({
+            id: (chatData[0][0]?.id || 0) + 1,
+            content: savedChat,
+            SenderId: myData?.id,
+            Sender: myData,
+            ReceiverId: userData?.id,
+            Receiver: userData,
+            createdAt: new Date(),
+          });
+          return prevChatData;
+        }, false).then(() => {
+          setChat("");
+          mutateChat();
+        });
+
         axios
           .post(`/api/workspaces/${workspace}/dms/${id}/chats`, {
             content: chat,
-          })
-          .then(() => {
-            setChat("");
-            mutateChat();
           })
           .catch((error) => {
             console.log(error);
           });
       }
     },
-    [chat, workspace, id, setChat, mutateChat]
+    [chat, workspace, id, setChat, mutateChat, userData, myData, chatData]
   );
-  const scrollbarRef = useRef<Scrollbars>(null);
+
+  useEffect(() => {
+    // 데이터 있는 경우 스크롤 바 제일 아래로
+    if (chatData?.length === 1) {
+      scrollbarRef.current?.scrollToBottom();
+    }
+  }, [chatData]);
 
   if (!userData || !myData) {
     return null;
   }
-
-  const chatSections = makeSection(chatData ? chatData.flat().reverse() : []);
 
   return (
     <Container>
@@ -93,7 +115,6 @@ export default function DirectMessage() {
         chatSections={chatSections}
         ref={scrollbarRef}
         setSize={setSize}
-        isEmpty={isEmpty}
         isReachingEnd={isReachingEnd}
       />
       <ChatBox
