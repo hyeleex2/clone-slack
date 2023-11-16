@@ -3,7 +3,6 @@ import { io, type Socket } from "socket.io-client";
 import { useCallback } from "react";
 
 const backUrl = `http://localhost:3095`;
-// const backUrl = `http://localhost:3095`;
 
 const sockets: { [key: string]: Socket } = {};
 

@@ -12,6 +12,7 @@ import axios from "axios";
 import useSWRInfinite from "swr/infinite";
 import makeSection from "@utils/makeSection";
 import Scrollbars from "react-custom-scrollbars";
+import useSocket from "@hooks/useSocket";
 
 export default function DirectMessage() {
   const { workspace, id } = useParams<{
@@ -21,7 +22,7 @@ export default function DirectMessage() {
 
   const [chat, onChangeChat, setChat] = useInput("");
   const scrollbarRef = useRef<Scrollbars>(null);
-
+  const [socket] = useSocket(workspace);
   const { data: userData } = useSWR<IUser>(
     `/api/workspace/${workspace}/users/${id}`,
     fetcher
@@ -41,7 +42,17 @@ export default function DirectMessage() {
       `/api/workspaces/${workspace}/dms/${id}/chats?perPage=${PAGE_SIZE}&page=${
         index + 1
       }`,
-    fetcher
+    fetcher,
+    {
+      // 데이터 있는 경우 스크롤 바 제일 아래로 이동
+      onSuccess(data) {
+        if (data?.length === 1) {
+          setTimeout(() => {
+            scrollbarRef.current?.scrollToBottom();
+          }, 100);
+        }
+      },
+    }
   );
 
   // 데이터가 비어있음
@@ -88,12 +99,37 @@ export default function DirectMessage() {
     [chat, workspace, id, setChat, mutateChat, userData, myData, chatData]
   );
 
+  const onMessage = useCallback(
+    (data: IDM) => {
+      // id = 상대방 id
+      // 상대방 화면에서만
+      if (data.SenderId === Number(id) && myData?.id !== Number(id)) {
+        mutateChat((chatData) => {
+          chatData?.[0].unshift(data);
+          return chatData;
+        }, false).then(() => {
+          if (scrollbarRef.current) {
+            const scrollH = Number(scrollbarRef.current?.getScrollHeight());
+            const scrollT = Number(scrollbarRef.current?.scrollToTop());
+            if (scrollH < scrollH + scrollT + 150) {
+              setTimeout(() => {
+                scrollbarRef.current?.scrollToBottom();
+              }, 100);
+            }
+          }
+        });
+      }
+    },
+    [scrollbarRef, id, mutateChat, myData]
+  );
+
   useEffect(() => {
-    // 데이터 있는 경우 스크롤 바 제일 아래로
-    if (chatData?.length === 1) {
-      scrollbarRef.current?.scrollToBottom();
-    }
-  }, [chatData]);
+    socket?.on("dm", onMessage);
+
+    return () => {
+      socket?.off("dm", onMessage);
+    };
+  }, [socket, onMessage]);
 
   if (!userData || !myData) {
     return null;
