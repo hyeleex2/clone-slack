@@ -5,7 +5,7 @@ import { ForwardedRef, MutableRefObject, forwardRef, useCallback } from "react";
 import { Scrollbars, positionValues } from "react-custom-scrollbars";
 
 type Prop = {
-  chatSections: { [key: string]: IDM[] };
+  chatSections: { [key: string]: IDM[] | IChat[] };
   isReachingEnd: boolean;
   setSize: (
     f: (size: number) => number
@@ -22,10 +22,10 @@ const ChatList = forwardRef(function ChatList(
       setSize((prevSize) => prevSize + 1).then(() => {
         // 스크롤 위치 유지
         // 현재 스크롤 높이에서 현재 스크롤 높이 빼주기
-        // const current = (scrollRef as MutableRefObject<Scrollbars>)?.current;
-        // if (current) {
-        //   current.scrollTop(current.getScrollHeight() - values.scrollHeight);
-        // }
+        const current = (scrollRef as MutableRefObject<Scrollbars>)?.current;
+        if (current) {
+          current.scrollTop(current.getScrollHeight() - values.scrollHeight);
+        }
       });
     }
   }, []);

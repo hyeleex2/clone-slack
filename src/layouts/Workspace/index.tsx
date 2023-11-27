@@ -277,11 +277,11 @@ export default function WorkSpace() {
         onCloseModal={onCloseModal}
         setShowInviteWorkspaceModal={setShowInviteWorkspaceModal}
       />
-      {/* <InviteChannelModal
+      <InviteChannelModal
         show={showInviteChannelModal}
         onCloseModal={onCloseModal}
         setShowInviteChannelModal={setShowInviteChannelModal}
-      /> */}
+      />
     </>
   );
 }

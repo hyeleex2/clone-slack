@@ -23,8 +23,9 @@ export default function DirectMessage() {
   const [chat, onChangeChat, setChat] = useInput("");
   const scrollbarRef = useRef<Scrollbars>(null);
   const [socket] = useSocket(workspace);
+
   const { data: userData } = useSWR<IUser>(
-    `/api/workspace/${workspace}/users/${id}`,
+    `/api/workspaces/${workspace}/users/${id}`,
     fetcher
   );
 

@@ -1,4 +1,4 @@
-import { IDM } from "@typings/db";
+import { IChat, IDM } from "@typings/db";
 import { ChatWrapper } from "./styles";
 import gravatar from "gravatar";
 import dayjs from "dayjs";
@@ -7,11 +7,12 @@ import { Link, useParams } from "react-router-dom";
 import { memo, useMemo } from "react";
 
 interface Props {
-  data: IDM;
+  data: IDM | IChat;
 }
 
 const Chat = memo(function Chat({ data }: Props) {
-  const user = data.Sender;
+  const user = "Sender" in data ? data.Sender : data.User;
+
   const { workspace } = useParams<{
     workspace: string;
   }>();
@@ -44,7 +45,7 @@ const Chat = memo(function Chat({ data }: Props) {
           return <br key={index} />;
         },
       }),
-    [data.content]
+    [data.content, workspace]
   );
 
   return (
