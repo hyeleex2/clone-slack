@@ -109,6 +109,11 @@ export default function DirectMessage() {
           chatData?.[0].unshift(data);
           return chatData;
         }, false).then(() => {
+          localStorage.setItem(
+            `${workspace}-${id}`,
+            new Date().getTime().toString()
+          );
+          setChat("");
           if (scrollbarRef.current) {
             const scrollH = Number(scrollbarRef.current?.getScrollHeight());
             const scrollT = Number(scrollbarRef.current?.scrollToTop());
@@ -121,8 +126,12 @@ export default function DirectMessage() {
         });
       }
     },
-    [scrollbarRef, id, mutateChat, myData]
+    [scrollbarRef, id, mutateChat, myData, setChat, workspace]
   );
+
+  useEffect(() => {
+    localStorage.setItem(`${workspace}-${id}`, new Date().getTime().toString());
+  }, [workspace, id]);
 
   useEffect(() => {
     socket?.on("dm", onMessage);

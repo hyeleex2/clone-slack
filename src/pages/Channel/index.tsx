@@ -1,5 +1,5 @@
 import useInput from "@hooks/useInput";
-import { Container, Header } from "./styles";
+import { Container, DragOver, Header } from "./styles";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import ChatList from "@components/ChatList";
 import ChatBox from "@components/ChatBox";
@@ -119,7 +119,11 @@ export default function Channel() {
 
   const onMessage = useCallback(
     (data: IChat) => {
-      if (data.Channel.name === channel && data.UserId !== myData.id) {
+      console.log("on message : ", data);
+      if (
+        data.Channel.name === channel &&
+        (data.content.startsWith("uploads\\") || data.UserId !== myData.id)
+      ) {
         mutateChat((chatData) => {
           chatData?.[0].unshift(data);
           return chatData;
@@ -143,6 +147,48 @@ export default function Channel() {
     setShowInviteChannelModal(true);
   }, []);
 
+  const [dragOver, setDragOver] = useState(false);
+
+  const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    if (e.dataTransfer.items) {
+      for (let i = 0; i < e.dataTransfer.items.length; i++) {
+        if (e.dataTransfer.items[i].kind === "file") {
+          const file = e.dataTransfer.items[i].getAsFile();
+          if (file) formData.append("image", file);
+        }
+      }
+    } else {
+      for (let i = 0; i < e.dataTransfer.files.length; i++) {
+        formData.append("image", e.dataTransfer.files[i]);
+      }
+    }
+    axios
+      .post(`/api/workspaces/${workspace}/channels/${channel}/images`, formData)
+      .then((data) => {
+        setDragOver(false);
+        console.log("성공? : ", data);
+        localStorage.setItem(
+          `${workspace}-${channel}`,
+          new Date().getTime().toString()
+        );
+      });
+  };
+
+  const onDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(true);
+  };
+
+  useEffect(() => {
+    localStorage.setItem(
+      `${workspace}-${channel}`,
+      new Date().getTime().toString()
+    );
+  }, [workspace, channel]);
+
   useEffect(() => {
     socket?.on("dm", onMessage);
 
@@ -156,7 +202,7 @@ export default function Channel() {
   }
 
   return (
-    <Container>
+    <Container onDrop={onDrop} onDragOver={onDragOver}>
       <Header>
         <div>
           <button
@@ -182,6 +228,7 @@ export default function Channel() {
         onChangeChat={onChangeChat}
         onSubmitForm={onSubmitForm}
       />
+      {dragOver && <DragOver>업로드</DragOver>}
       <InviteChannelModal
         show={showInviteChannelModal}
         onCloseModal={onCloseModal}

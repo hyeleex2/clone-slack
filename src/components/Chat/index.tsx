@@ -17,35 +17,36 @@ const Chat = memo(function Chat({ data }: Props) {
     workspace: string;
   }>();
 
-  const result = useMemo(
+  const BACK_URL = import.meta.env.DEV
+    ? "http://localhost:3095"
+    : "https://sleact.nodebird.com";
+
+  const result = useMemo<(string | JSX.Element)[] | JSX.Element>(
     () =>
-      regexifyString({
-        input: data.content,
-        // . : 모든 글자
-        // g : 모두 찾기
-        // + : 1개 이상(최대한 많이)
-        // \d : 숫자
-        // ? : 0개나 1개
-        // * : 0개 이상
-        // +? : 최대한 조금
-        // \n : 줄바꿈
-        pattern: /@\[(.+?)]\((\d+?)\)|\n/g, // [닉네임](아이디) 또는 줄바꿈
-        decorator(match: string, index: number) {
-          const arr: string[] | null = match.match(/@\[(.+?)]\((\d+?)\)/)!;
-          if (arr) {
-            return (
-              <Link
-                key={match + index}
-                to={`/workspace/${workspace}/dm/${arr[2]}`}
-              >
-                @{arr[1]}
-              </Link>
-            );
-          }
-          return <br key={index} />;
-        },
-      }),
-    [data.content, workspace]
+      data.content.startsWith("uploads\\") ||
+      data.content.startsWith("uploads/") ? (
+        <img src={`${BACK_URL}/${data.content}`} style={{ maxHeight: 200 }} />
+      ) : (
+        regexifyString({
+          pattern: /@\[(.+?)]\((\d+?)\)|\n/g,
+          decorator(match, index) {
+            const arr: string[] | null = match.match(/@\[(.+?)]\((\d+?)\)/)!;
+            if (arr) {
+              return (
+                <Link
+                  key={match + index}
+                  to={`/workspace/${workspace}/dm/${arr[2]}`}
+                >
+                  @{arr[1]}
+                </Link>
+              );
+            }
+            return <br key={index} />;
+          },
+          input: data.content,
+        })
+      ),
+    [workspace, data.content]
   );
 
   return (
